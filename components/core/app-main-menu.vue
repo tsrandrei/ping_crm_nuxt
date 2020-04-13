@@ -9,7 +9,7 @@
       </nuxt-link>
     </div>
     <div class="mb-4">
-      <nuxt-link to="/organisations/index" class="flex items-center group py-3" role="navigation" aria-label="Organizations">
+      <nuxt-link to="/organisations" class="flex items-center group py-3" role="navigation" aria-label="Organizations">
         <icon
           name="office"
           class="w-4 h-4 mr-2"
@@ -22,7 +22,7 @@
     </div>
     <div class="mb-4">
       <nuxt-link
-        to="/dashboard"
+        to="/contacts"
         class="flex items-center group py-3"
         role="navigation"
         aria-label="Contacts"
@@ -39,7 +39,7 @@
     </div>
     <div class="mb-4">
       <nuxt-link
-        to="/dashboard"
+        to="/reports"
         class="flex items-center group py-3"
         role="navigation"
         aria-label="Reports"
@@ -59,7 +59,7 @@
         to="/dashboard"
         class="flex items-center group py-3"
         role="navigation"
-        aria-label="Reports"
+        aria-label="Settings"
       >
         <Settings24 class="mr-2" :class="isUrl('reports') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
         <div :class="isUrl('reports') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">
@@ -72,7 +72,7 @@
         to="/dashboard"
         class="flex items-center group py-3"
         role="navigation"
-        aria-label="Reports"
+        aria-label="snap"
       >
         <Settings24 class="mr-2" :class="isUrl('reports') ? 'fill-white' : 'fill-indigo-400 group-hover:fill-white'" />
         <div :class="isUrl('reports') ? 'text-white' : 'text-indigo-300 group-hover:text-white'">

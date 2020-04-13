@@ -4,20 +4,11 @@
       Organizations
     </h1>
     <div class="mb-6 flex justify-between items-center">
-      <search-filter
-        v-model="form.search"
-        class="w-full max-w-md mr-4"
-        @reset="reset"
-      >
-        <label
-          class="block text-gray-800"
-          for="trashed-filter"
-        >Trashed:</label>
-        <select
-          id="trashed-filter"
-          v-model="form.trashed"
-          class="mt-1 w-full form-select"
-        >
+      <search-filter v-model="form.search" class="w-full max-w-md mr-4" @reset="reset">
+        <label class="block text-gray-800" for="trashed-filter">
+          Trashed:
+        </label>
+        <select id="trashed-filter" v-model="form.trashed" class="mt-1 w-full form-select">
           <option :value="null" />
           <option value="with">
             With Trashed
@@ -28,20 +19,13 @@
         </select>
       </search-filter>
 
-      <button
-        class="btn-indigo"
-        @click="modalNew = true"
-      >
+      <button class="btn-indigo" @click="modalNew = true">
         <span>Create</span>
         <span class="hidden md:inline">Organization</span>
       </button>
-      <modal
-        :open="modalNew"
-        title="Create Organization"
-        @close="modalNew = false"
-      >
+      <!-- <modal :open="modalNew" title="Create Organization" @close="modalNew = false">
         <new-organization @success="modalNew = false" />
-      </modal>
+      </modal> -->
     </div>
     <div class="bg-white rounded shadow overflow-x-auto">
       <table class="w-full whitespace-no-wrap">
@@ -135,20 +119,20 @@
 // import Icon from '~/components/Icon'
 // import Layout from '~/components/Main'
 import mapValues from 'lodash/mapValues'
-// import Pagination from '~/components/Pagination'
-// import pickBy from 'lodash/pickBy'
-// import SearchFilter from '~/components/SearchFilter'
+import Pagination from '~/components/Pagination'
+import pickBy from 'lodash/pickBy'
+import SearchFilter from '~/components/SearchFilter'
 // import Modal from '~/components/Modal'
 // import NewOrganization from '~/components/organizations/_New'
 import throttle from 'lodash/throttle'
 
 export default {
   // metaInfo: { title: 'Organizations' },
-  // layout: 'dashboard',
+  layout: 'dashboard',
   components: {
 
-    // Pagination,
-    // SearchFilter,
+    Pagination,
+    SearchFilter,
     // Modal,
     // NewOrganization,
   },
