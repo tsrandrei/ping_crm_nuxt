@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="mb-8 font-bold text-3xl">
-      Organizations
+      Users
     </h1>
     <div class="mb-6 flex justify-between items-center">
       <search-filter
@@ -11,6 +11,23 @@
       >
         <label
           class="block text-gray-800"
+          for="role-filter"
+        >Role:</label>
+        <select
+          id="role-filter"
+          v-model="form.role"
+          class="mt-1 w-full form-select"
+        >
+          <option :value="null" />
+          <option value="user">
+            User
+          </option>
+          <option value="owner">
+            Owner
+          </option>
+        </select>
+        <label
+          class="mt-4 block text-gray-800"
           for="trashed-filter"
         >Trashed:</label>
         <select
@@ -27,21 +44,14 @@
           </option>
         </select>
       </search-filter>
-
-      <button
+      <inertia-link
+        v-if="can.create_user"
         class="btn-indigo"
-        @click="modalNew = true"
+        :href="$routes.new_user()"
       >
         <span>Create</span>
-        <span class="hidden md:inline">Organization</span>
-      </button>
-      <modal
-        :open="modalNew"
-        title="Create Organization"
-        @close="modalNew = false"
-      >
-        <new-organization @success="modalNew = false" />
-      </modal>
+        <span class="hidden md:inline">User</span>
+      </inertia-link>
     </div>
     <div class="bg-white rounded shadow overflow-x-auto">
       <table class="w-full whitespace-no-wrap">
@@ -51,32 +61,37 @@
               Name
             </th>
             <th class="px-6 pt-6 pb-4">
-              City
+              Email
             </th>
             <th
               class="px-6 pt-6 pb-4"
               colspan="2"
             >
-              Phone
-
-
+              Role
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="organization in organizations"
-            :key="organization.id"
+            v-for="user in users"
+            :key="user.id"
             class="hover:bg-gray-100 focus-within:bg-gray-100"
           >
             <td class="border-t">
               <inertia-link
                 class="px-6 py-4 flex items-center focus:text-indigo-500"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_user(user.id)"
+                aria-label="Edit"
               >
-                {{ organization.name }}
+                <img
+                  v-if="user.photo"
+                  class="block w-5 h-5 rounded-full mr-2 -my-2"
+                  :src="user.photo"
+                  alt="Photo"
+                >
+                {{ user.name }}
                 <icon
-                  v-if="organization.deleted_at"
+                  v-if="user.deleted_at"
                   name="trash"
                   class="flex-shrink-0 w-3 h-3 fill-gray-500 ml-2"
                 />
@@ -85,27 +100,27 @@
             <td class="border-t">
               <inertia-link
                 class="px-6 py-4 flex items-center"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_user(user.id)"
                 tabindex="-1"
                 aria-label="Edit"
               >
-                {{ organization.city }}
+                {{ user.email }}
               </inertia-link>
             </td>
             <td class="border-t">
               <inertia-link
                 class="px-6 py-4 flex items-center"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_user(user.id)"
                 tabindex="-1"
                 aria-label="Edit"
               >
-                {{ organization.phone }}
+                {{ user.owner ? 'Owner' : 'User' }}
               </inertia-link>
             </td>
             <td class="border-t w-px">
               <inertia-link
                 class="px-4 flex items-center"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_user(user.id)"
                 tabindex="-1"
                 aria-label="Edit"
               >
@@ -116,81 +131,74 @@
               </inertia-link>
             </td>
           </tr>
-          <!-- <tr v-if="organizations.data.length === 0"> -->
+          <tr v-if="users.length === 0">
             <td
               class="border-t px-6 py-4"
               colspan="4"
             >
-              No organizations found.
+              No users found.
             </td>
-          <!-- </tr> -->
+          </tr>
         </tbody>
       </table>
     </div>
-    <!-- <pagination :meta="organizations.meta" /> -->
   </div>
 </template>
 
 <script>
-// import Icon from '~/components/Icon'
-// import Layout from '~/components/Main'
+import Icon from '~/components/Icon'
 import mapValues from 'lodash/mapValues'
-// import Pagination from '~/components/Pagination'
-// import pickBy from 'lodash/pickBy'
-// import SearchFilter from '~/components/SearchFilter'
-// import Modal from '~/components/Modal'
-// import NewOrganization from '~/components/organizations/_New'
+import pickBy from 'lodash/pickBy'
+import SearchFilter from '~/components/SearchFilter'
 import throttle from 'lodash/throttle'
 
 export default {
-  // metaInfo: { title: 'Organizations' },
-  // layout: 'dashboard',
+  metaInfo: { title: 'Users' },
+  layout: 'dashboard',
   components: {
-
-    // Pagination,
-    // SearchFilter,
-    // Modal,
-    // NewOrganization,
+    Icon,
+    SearchFilter,
   },
   props: {
-    // organizations: {
-    //   type: Object,
-    //   required: true,
-    // },
-    // filters: {
-    //   type: Object,
-    //   required: true,
-    // },
+    users: {
+      type: Array,
+      required: true,
+    },
+    filters: {
+      type: Object,
+      required: true,
+    },
+    can: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
-      data:{
-
-      },
       form: {
-        search: null,
-        trashed: null,
+        search: this.filters.search,
+        role: this.filters.role,
+        trashed: this.filters.trashed,
       },
-      modalNew: false,
     }
   },
   watch: {
-    // form: {
-    //   handler: throttle(function() {
-    //     let query = pickBy(this.form)
-    //     this.$inertia.replace(
-    //       this.$routes.admin_organizations(
-    //         Object.keys(query).length ? query : { remember: 'forget' },
-    //       ),
-    //       {
-    //         preserveState: true,
-    //         preserveScroll: true,
-    //         only: ['organizations'],
-    //       },
-    //     )
-    //   }, 150),
-    //   deep: true,
-    // },
+    form: {
+      handler: throttle(function() {
+        let query = pickBy(this.form)
+        this.$inertia.replace(
+          this.$routes.users(
+            Object.keys(query).length ? query : { remember: 'forget' },
+          ),
+          {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['users'],
+          },
+        )
+      }, 150),
+      deep: true,
+    },
   },
   methods: {
     reset() {

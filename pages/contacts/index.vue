@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="mb-8 font-bold text-3xl">
-      Organizations
+      Contacts
     </h1>
     <div class="mb-6 flex justify-between items-center">
       <search-filter
@@ -27,21 +27,13 @@
           </option>
         </select>
       </search-filter>
-
-      <button
+      <inertia-link
         class="btn-indigo"
-        @click="modalNew = true"
+        :href="$routes.new_admin_contact()"
       >
         <span>Create</span>
-        <span class="hidden md:inline">Organization</span>
-      </button>
-      <modal
-        :open="modalNew"
-        title="Create Organization"
-        @close="modalNew = false"
-      >
-        <new-organization @success="modalNew = false" />
-      </modal>
+        <span class="hidden md:inline">Contact</span>
+      </inertia-link>
     </div>
     <div class="bg-white rounded shadow overflow-x-auto">
       <table class="w-full whitespace-no-wrap">
@@ -51,6 +43,9 @@
               Name
             </th>
             <th class="px-6 pt-6 pb-4">
+              Organization
+            </th>
+            <th class="px-6 pt-6 pb-4">
               City
             </th>
             <th
@@ -58,25 +53,24 @@
               colspan="2"
             >
               Phone
-
-
             </th>
           </tr>
         </thead>
         <tbody>
           <tr
-            v-for="organization in organizations"
-            :key="organization.id"
+            v-for="contact in contacts.data"
+            :key="contact.id"
             class="hover:bg-gray-100 focus-within:bg-gray-100"
           >
             <td class="border-t">
               <inertia-link
                 class="px-6 py-4 flex items-center focus:text-indigo-500"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_admin_contact(contact.id)"
+                aria-label="Edit"
               >
-                {{ organization.name }}
+                {{ contact.name }}
                 <icon
-                  v-if="organization.deleted_at"
+                  v-if="contact.deleted_at"
                   name="trash"
                   class="flex-shrink-0 w-3 h-3 fill-gray-500 ml-2"
                 />
@@ -85,27 +79,39 @@
             <td class="border-t">
               <inertia-link
                 class="px-6 py-4 flex items-center"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_admin_contact(contact.id)"
                 tabindex="-1"
                 aria-label="Edit"
               >
-                {{ organization.city }}
+                <div v-if="contact.organization">
+                  {{ contact.organization.name }}
+                </div>
               </inertia-link>
             </td>
             <td class="border-t">
               <inertia-link
                 class="px-6 py-4 flex items-center"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_admin_contact(contact.id)"
                 tabindex="-1"
                 aria-label="Edit"
               >
-                {{ organization.phone }}
+                {{ contact.city }}
+              </inertia-link>
+            </td>
+            <td class="border-t">
+              <inertia-link
+                class="px-6 py-4 flex items-center"
+                :href="$routes.edit_admin_contact(contact.id)"
+                tabindex="-1"
+                aria-label="Edit"
+              >
+                {{ contact.phone }}
               </inertia-link>
             </td>
             <td class="border-t w-px">
               <inertia-link
                 class="px-4 flex items-center"
-                :href="$routes.edit_admin_organization(organization.id)"
+                :href="$routes.edit_admin_contact(contact.id)"
                 tabindex="-1"
                 aria-label="Edit"
               >
@@ -116,81 +122,72 @@
               </inertia-link>
             </td>
           </tr>
-          <!-- <tr v-if="organizations.data.length === 0"> -->
+          <tr v-if="contacts.data.length === 0">
             <td
               class="border-t px-6 py-4"
               colspan="4"
             >
-              No organizations found.
+              No contacts found.
             </td>
-          <!-- </tr> -->
+          </tr>
         </tbody>
       </table>
     </div>
-    <!-- <pagination :meta="organizations.meta" /> -->
+    <pagination :meta="contacts.meta" />
   </div>
 </template>
 
 <script>
-// import Icon from '~/components/Icon'
-// import Layout from '~/components/Main'
+import Icon from '~/components/Icon'
 import mapValues from 'lodash/mapValues'
-// import Pagination from '~/components/Pagination'
-// import pickBy from 'lodash/pickBy'
-// import SearchFilter from '~/components/SearchFilter'
-// import Modal from '~/components/Modal'
-// import NewOrganization from '~/components/organizations/_New'
+import Pagination from '~/components/Pagination'
+import pickBy from 'lodash/pickBy'
+import SearchFilter from '~/components/SearchFilter'
 import throttle from 'lodash/throttle'
 
 export default {
-  // metaInfo: { title: 'Organizations' },
-  // layout: 'dashboard',
+  metaInfo: { title: 'Contacts' },
+  layout: 'dashboard',
   components: {
-
-    // Pagination,
-    // SearchFilter,
-    // Modal,
-    // NewOrganization,
+    Icon,
+    Pagination,
+    SearchFilter,
   },
   props: {
-    // organizations: {
-    //   type: Object,
-    //   required: true,
-    // },
-    // filters: {
-    //   type: Object,
-    //   required: true,
-    // },
+    contacts: {
+      type: Object,
+      required: true,
+    },
+    filters: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
-      data:{
-
-      },
       form: {
-        search: null,
-        trashed: null,
+        search: this.filters.search,
+        trashed: this.filters.trashed,
       },
-      modalNew: false,
     }
   },
   watch: {
-    // form: {
-    //   handler: throttle(function() {
-    //     let query = pickBy(this.form)
-    //     this.$inertia.replace(
-    //       this.$routes.admin_organizations(
-    //         Object.keys(query).length ? query : { remember: 'forget' },
-    //       ),
-    //       {
-    //         preserveState: true,
-    //         preserveScroll: true,
-    //         only: ['organizations'],
-    //       },
-    //     )
-    //   }, 150),
-    //   deep: true,
-    // },
+    form: {
+      handler: throttle(function() {
+        let query = pickBy(this.form)
+        this.$inertia.replace(
+          this.$routes.contacts(
+            Object.keys(query).length ? query : { remember: 'forget' },
+          ),
+          {
+            preserveState: true,
+            preserveScroll: true,
+            only: ['contacts'],
+          },
+        )
+      }, 150),
+      deep: true,
+    },
   },
   methods: {
     reset() {

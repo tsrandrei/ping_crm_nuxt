@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import Dropdown from '@/Shared/Dropdown'
+import Dropdown from '~/components/Dropdown'
 
 export default {
   components: {
