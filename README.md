@@ -5,7 +5,7 @@ Stack :
  - Tailwindcss
  
 
-This project is an inspiration of InertiaJS - PingCRM dashboard.
+This project is an inspiration of [InertiaJS](https://inertiajs.com/) - PingCRM dashboard.
 Current state : WIP
 
 
