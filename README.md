@@ -1,4 +1,4 @@
-# pinx_crm
+# pinx_crm_nuxt
 
 Stack :
  - NuxtJS ( VueJS )
