@@ -1,6 +1,13 @@
 # pinx_crm
 
-> My finest Nuxt.js project
+Stack :
+ - NuxtJS ( VueJS )
+ - Tailwindcss
+ 
+
+This project is an inspiration of InertiaJS - PingCRM dashboard.
+Current state : WIP
+
 
 ## Build Setup
 
